@@ -81,10 +81,19 @@ mod tests {
 
     #[test]
     fn test_lemmatize() {
-        let lemmas = vec!["hello".to_string(), "world".to_string()];
+        let lemmas = vec![
+            "hello".to_string(),
+            "world".to_string(),
+            "how're".to_string(),
+            "you".to_string(),
+            "doing".to_string(),
+        ];
         let result = lemmatize(lemmas);
         assert_eq!(result.contains(&"hello".to_string()), true);
         assert_eq!(result.contains(&"world".to_string()), true);
+        assert_eq!(result.contains(&"how".to_string()), false);
+        assert_eq!(result.contains(&"you".to_string()), true);
+        assert_eq!(result.contains(&"do".to_string()), true);
     }
 
     #[test]

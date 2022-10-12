@@ -23,3 +23,17 @@ pub fn load_bytes(path: &Path) -> Vec<u8> {
     file.read_to_end(&mut buffer).unwrap();
     buffer
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::path::PathBuf;
+
+    #[test]
+    fn test_load_bytes() {
+        let path = PathBuf::from("src/serialize/test.txt");
+        let expected = vec![116, 101, 115, 116];
+        let actual = load_bytes(&path);
+        assert_eq!(actual, expected);
+    }
+}
