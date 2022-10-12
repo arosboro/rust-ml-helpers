@@ -19,7 +19,7 @@ pub mod stopwords {
         return stopwords;
     }
 }
-pub fn clean(text: &str, expressions: Vec<Regex>) -> String {
+pub fn clean(text: &str, expressions: &Vec<Regex>) -> String {
     let mut acc: String = text.to_owned();
     for expression in expressions.iter() {
         let replace: &str = if expression.as_str() == r"\s+" {
