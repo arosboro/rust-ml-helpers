@@ -1,6 +1,6 @@
-mod normalize;
-mod preprocess;
-mod serialize;
+pub mod normalize;
+pub mod preprocess;
+pub mod serialize;
 
 use serde::{Deserialize, Serialize};
 
