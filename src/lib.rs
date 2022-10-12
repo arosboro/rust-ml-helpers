@@ -1,3 +1,4 @@
+mod normalize;
 mod preprocess;
 mod serialize;
 
