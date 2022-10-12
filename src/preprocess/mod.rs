@@ -45,7 +45,7 @@ pub fn tokenize(
     expressions: Vec<Regex>,
     stopwords: HashSet<&'static str>,
 ) -> Vec<String> {
-    let clean = clean(text.to_lowercase().as_str(), expressions);
+    let clean = clean(text.to_lowercase().as_str(), &expressions);
     let tokenizer = VTextTokenizerParams::default().lang("en").build().unwrap();
     let mut tokens: Vec<&str> = tokenizer.tokenize(&clean).collect();
     // a token could be empty so, retain ones with length greater than one
@@ -75,7 +75,7 @@ mod tests {
             Regex::new(r"[^a-zA-Z0-9\s]").unwrap(),
             Regex::new(r"\s+").unwrap(),
         ];
-        let result = clean(&text, expressions);
+        let result = clean(&text, &expressions);
         assert_eq!(result, "Hello world 123");
     }
 
