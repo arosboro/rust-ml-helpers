@@ -1,5 +1,11 @@
 use serde::{Deserialize, Serialize};
-use std::{collections::HashMap, fs::File, fs::OpenOptions, io::Read, path::Path};
+use std::{
+    collections::HashMap,
+    fs::File,
+    fs::OpenOptions,
+    io::{Read, Write},
+    path::Path,
+};
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Term {
@@ -32,6 +38,11 @@ pub fn open_file_truncate(path: &Path) -> std::io::Result<File> {
         .open(path)
 }
 
+pub fn write_file_truncate(path: &Path, data: &Vec<u8>) -> std::io::Result<()> {
+    let mut file = open_file_truncate(path)?;
+    file.write_all(data)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -51,5 +62,13 @@ mod tests {
         let file = open_file_truncate(&path);
         assert!(file.is_ok());
         file.unwrap().write_all(b"test").unwrap();
+    }
+
+    #[test]
+    fn test_write_file_truncate() {
+        let path = PathBuf::from("src/serialize/test.txt");
+        let data: Vec<u8> = b"test".to_vec();
+        let result = write_file_truncate(&path, &data);
+        assert!(result.is_ok());
     }
 }
