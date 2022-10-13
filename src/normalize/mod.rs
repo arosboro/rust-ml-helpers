@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-pub fn build_dictionary(dictionary: &mut HashMap<String, f64>, document: Vec<String>) -> () {
+pub fn build_dictionary(dictionary: &mut HashMap<String, f64>, document: &Vec<String>) -> () {
     for term in document {
         if !dictionary.contains_key(&term.to_string()) {
             dictionary.insert(term.to_string(), dictionary.len() as f64);
@@ -52,7 +52,7 @@ mod tests {
         let expected: HashMap<String, f64> = vec![("a".to_string(), 0.0), ("b".to_string(), 1.0)]
             .into_iter()
             .collect();
-        build_dictionary(&mut dictionary, document);
+        build_dictionary(&mut dictionary, &document);
         assert_eq!(dictionary, expected);
     }
 
