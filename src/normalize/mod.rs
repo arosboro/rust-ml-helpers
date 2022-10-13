@@ -1,3 +1,4 @@
+use nalgebra::{DMatrix, DMatrixSlice};
 use std::collections::HashMap;
 use std::string::String;
 
@@ -40,6 +41,28 @@ pub fn build_classifier_frequency(
             }
         }
     }
+}
+
+pub fn tf(doc: DMatrixSlice<String>, term: &String) -> f64 {
+    DMatrix::from_fn(doc.nrows(), doc.ncols(), |i, j| {
+        if doc[(i, j)] == *term {
+            1.0
+        } else {
+            0.0
+        }
+    })
+    .sum()
+        / doc.ncols() as f64
+}
+
+pub fn idf(
+    term: &String,
+    corpus: DMatrix<String>,
+    document_frequency: HashMap<String, f64>,
+) -> f64 {
+    // Smooth inverse formula by adding 1.0 to denominator to prevent division by zero
+    let score = (corpus.nrows() as f64 / (document_frequency[term] + 1.0)).ln() as f64;
+    score
 }
 
 #[cfg(test)]
@@ -179,5 +202,128 @@ mod tests {
         }
         assert_eq!(classifier_frequency, expected_classifier_frequency);
         assert_eq!(actual_overall_frequency, expected_overall_frequency);
+    }
+
+    #[test]
+    fn test_tf() {
+        let document1: Vec<String> = vec![
+            "a".to_string(),
+            "a".to_string(),
+            "b".to_string(),
+            "c".to_string(),
+        ];
+        let document2: Vec<String> = vec![
+            "a".to_string(),
+            "b".to_string(),
+            "c".to_string(),
+            "c".to_string(),
+        ];
+        let corpus: DMatrix<String> = DMatrix::from_fn(2, 4, |i, j| {
+            if i == 0 {
+                document1[j].clone()
+            } else if i == 1 {
+                document2[j].clone()
+            } else {
+                "".to_string()
+            }
+        });
+        let expected_tf: DMatrix<f64> = DMatrix::from_fn(2, 4, |i, j| {
+            if i == 0 {
+                if j == 0 {
+                    2.0 / 4.0
+                } else if j == 1 {
+                    2.0 / 4.0
+                } else if j == 2 {
+                    1.0 / 4.0
+                } else if j == 3 {
+                    1.0 / 4.0
+                } else {
+                    0.0
+                }
+            } else if i == 1 {
+                if j == 0 {
+                    1.0 / 4.0
+                } else if j == 1 {
+                    1.0 / 4.0
+                } else if j == 2 {
+                    2.0 / 4.0
+                } else if j == 3 {
+                    2.0 / 4.0
+                } else {
+                    0.0
+                }
+            } else {
+                0.0
+            }
+        });
+        let actual_tf = DMatrix::from_fn(2, 4, |i, j| {
+            tf(corpus.slice((i, 0), (1, corpus.ncols())), &corpus[(i, j)])
+        });
+        assert_eq!(actual_tf, expected_tf);
+    }
+
+    #[test]
+    fn test_idf() {
+        let document1: Vec<String> = vec![
+            "a".to_string(),
+            "a".to_string(),
+            "b".to_string(),
+            "c".to_string(),
+        ];
+        let document2: Vec<String> = vec![
+            "a".to_string(),
+            "c".to_string(),
+            "c".to_string(),
+            "c".to_string(),
+        ];
+        let corpus: DMatrix<String> = DMatrix::from_fn(2, 4, |i, j| {
+            if i == 0 {
+                document1[j].clone()
+            } else if i == 1 {
+                document2[j].clone()
+            } else {
+                "".to_string()
+            }
+        });
+        let df_index: HashMap<String, f64> = vec![
+            ("a".to_string(), 2.0),
+            ("b".to_string(), 1.0),
+            ("c".to_string(), 2.0),
+        ]
+        .into_iter()
+        .collect();
+        let expected_idf: DMatrix<f64> = DMatrix::from_fn(2, 4, |i, j| {
+            if i == 0 {
+                if j == 0 {
+                    (2.0 / (2.0 + 1.0) as f64).ln()
+                } else if j == 1 {
+                    (2.0 / (2.0 + 1.0) as f64).ln()
+                } else if j == 2 {
+                    (2.0 / (1.0 + 1.0) as f64).ln()
+                } else if j == 3 {
+                    (2.0 / (2.0 + 1.0) as f64).ln()
+                } else {
+                    0.0
+                }
+            } else if i == 1 {
+                if j == 0 {
+                    (2.0 / (2.0 + 1.0) as f64).ln()
+                } else if j == 1 {
+                    (2.0 / (2.0 + 1.0) as f64).ln()
+                } else if j == 2 {
+                    (2.0 / (2.0 + 1.0) as f64).ln()
+                } else if j == 3 {
+                    (2.0 / (2.0 + 1.0) as f64).ln()
+                } else {
+                    0.0
+                }
+            } else {
+                0.0
+            }
+        });
+        let actual_idf = DMatrix::from_fn(2, 4, |i, j| {
+            idf(&corpus[(i, j)], corpus.clone(), df_index.clone())
+        });
+        assert_eq!(actual_idf, expected_idf);
     }
 }
