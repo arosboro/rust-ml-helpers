@@ -1,5 +1,5 @@
 use serde::{Deserialize, Serialize};
-use std::{collections::HashMap, fs::File, io::Read, path::Path};
+use std::{collections::HashMap, fs::File, fs::OpenOptions, io::Read, path::Path};
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Term {
@@ -24,10 +24,18 @@ pub fn load_bytes(path: &Path) -> Vec<u8> {
     buffer
 }
 
+pub fn open_file_truncate(path: &Path) -> std::io::Result<File> {
+    OpenOptions::new()
+        .write(true)
+        .create(true)
+        .truncate(true)
+        .open(path)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::path::PathBuf;
+    use std::{io::Write, path::PathBuf};
 
     #[test]
     fn test_load_bytes() {
@@ -35,5 +43,13 @@ mod tests {
         let expected = vec![116, 101, 115, 116];
         let actual = load_bytes(&path);
         assert_eq!(actual, expected);
+    }
+
+    #[test]
+    fn test_open_file_truncate() {
+        let path = PathBuf::from("src/serialize/test.txt");
+        let file = open_file_truncate(&path);
+        assert!(file.is_ok());
+        file.unwrap().write_all(b"test").unwrap();
     }
 }
