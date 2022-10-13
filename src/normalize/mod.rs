@@ -1,15 +1,11 @@
 use std::collections::HashMap;
 
-pub fn build_dictionary(
-    mut dictionary: HashMap<String, f64>,
-    document: Vec<String>,
-) -> HashMap<String, f64> {
+pub fn build_dictionary(dictionary: &mut HashMap<String, f64>, document: Vec<String>) -> () {
     for term in document {
         if !dictionary.contains_key(&term.to_string()) {
             dictionary.insert(term.to_string(), dictionary.len() as f64);
         }
     }
-    dictionary
 }
 
 pub fn build_document_frequency_overall_frequency(
@@ -51,13 +47,13 @@ mod tests {
 
     #[test]
     fn test_build_dictionary() {
-        let dictionary: HashMap<String, f64> = HashMap::new();
+        let mut dictionary: HashMap<String, f64> = HashMap::new();
         let document: Vec<String> = vec!["a".to_string(), "b".to_string()];
         let expected: HashMap<String, f64> = vec![("a".to_string(), 0.0), ("b".to_string(), 1.0)]
             .into_iter()
             .collect();
-        let actual = build_dictionary(dictionary, document);
-        assert_eq!(actual, expected);
+        build_dictionary(&mut dictionary, document);
+        assert_eq!(dictionary, expected);
     }
 
     #[test]
