@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::string::String;
 
 pub fn build_dictionary(dictionary: &mut HashMap<String, f64>, document: &Vec<String>) -> () {
     for term in document {
@@ -9,7 +10,7 @@ pub fn build_dictionary(dictionary: &mut HashMap<String, f64>, document: &Vec<St
 }
 
 pub fn build_document_frequency_overall_frequency(
-    overall_frequency: &mut HashMap<std::string::String, f64>,
+    overall_frequency: &mut HashMap<String, f64>,
     document: &Vec<String>,
 ) -> HashMap<String, f64> {
     let document_frequency =
