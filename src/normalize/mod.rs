@@ -61,7 +61,7 @@ pub fn idf(
     document_frequency: HashMap<String, f64>,
 ) -> f64 {
     // Smooth inverse formula by adding 1.0 to denominator to prevent division by zero
-    let score = (corpus.nrows() as f64 / (document_frequency[term] + 1.0)).ln() as f64;
+    let score = (corpus.nrows() as f64 / (document_frequency[term])).ln() as f64;
     score
 }
 
@@ -294,26 +294,8 @@ mod tests {
         .collect();
         let expected_idf: DMatrix<f64> = DMatrix::from_fn(2, 4, |i, j| {
             if i == 0 {
-                if j == 0 {
-                    (2.0 / (2.0 + 1.0) as f64).ln()
-                } else if j == 1 {
-                    (2.0 / (2.0 + 1.0) as f64).ln()
-                } else if j == 2 {
-                    (2.0 / (1.0 + 1.0) as f64).ln()
-                } else if j == 3 {
-                    (2.0 / (2.0 + 1.0) as f64).ln()
-                } else {
-                    0.0
-                }
-            } else if i == 1 {
-                if j == 0 {
-                    (2.0 / (2.0 + 1.0) as f64).ln()
-                } else if j == 1 {
-                    (2.0 / (2.0 + 1.0) as f64).ln()
-                } else if j == 2 {
-                    (2.0 / (2.0 + 1.0) as f64).ln()
-                } else if j == 3 {
-                    (2.0 / (2.0 + 1.0) as f64).ln()
+                if j == 2 {
+                    (2.0 as f64).ln()
                 } else {
                     0.0
                 }
