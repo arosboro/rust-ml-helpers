@@ -55,13 +55,9 @@ pub fn tf(doc: DMatrixSlice<String>, term: &String) -> f64 {
         / doc.ncols() as f64
 }
 
-pub fn idf(
-    term: &String,
-    corpus: DMatrix<String>,
-    document_frequency: HashMap<String, f64>,
-) -> f64 {
-    // Smooth inverse formula by adding 1.0 to denominator to prevent division by zero
-    let score = (corpus.nrows() as f64 / (document_frequency[term])).ln() as f64;
+pub fn idf(term_frequency: f64, corpus_rows: usize) -> f64 {
+    assert!(term_frequency != 0.0);
+    let score = (corpus_rows as f64 / (term_frequency)).ln() as f64;
     score
 }
 
@@ -303,9 +299,8 @@ mod tests {
                 0.0
             }
         });
-        let actual_idf = DMatrix::from_fn(2, 4, |i, j| {
-            idf(&corpus[(i, j)], corpus.clone(), df_index.clone())
-        });
+        let actual_idf =
+            DMatrix::from_fn(2, 4, |i, j| idf(df_index[&corpus[(i, j)]], corpus.nrows()));
         assert_eq!(actual_idf, expected_idf);
     }
 }
